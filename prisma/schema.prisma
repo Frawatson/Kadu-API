@@ -1,0 +1,76 @@
+// Smoke-test slice schema — only what's needed to swap MSW off for
+// auth + general-settings. PR-9B's team / invitations are deferred
+// until a later session expands scope.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BusinessType {
+  HARDWARE_STORE
+  PLUMBING_SUPPLY
+  ELECTRICAL_SUPPLY
+  PAINT_AND_FINISHES
+  TOOLS_AND_EQUIPMENT
+  OTHER
+}
+
+enum PartnerStatus {
+  ACTIVE
+  PENDING_REVIEW
+  SUSPENDED
+}
+
+enum PartnerRole {
+  OWNER
+  MANAGER
+  ACCOUNTANT
+}
+
+enum CurrencyCode {
+  USD
+  LRD
+}
+
+model Partner {
+  id              String        @id @default(cuid())
+  businessName    String
+  businessPhone   String
+  /// Single-line business address captured during onboarding step 2.
+  /// Real schema will probably split this into structured Location
+  /// records; for the smoke-test backend a flat string is enough.
+  businessAddress String?
+  businessType    BusinessType  @default(HARDWARE_STORE)
+  email           String        @unique
+  ownerName       String
+  role            PartnerRole   @default(OWNER)
+  status          PartnerStatus @default(ACTIVE)
+  shopEnabled     Boolean       @default(true)
+  /// bcrypt hash; never returned to clients.
+  passwordHash    String
+  /// JSON snapshot of the setup wizard progress — matches the
+  /// frontend's `PartnerProfile.setupProgress` shape.
+  setupProgress   Json
+  /// Frontend treats locations as a separate fetch in v1; we just
+  /// echo an empty array so the contract compiles.
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  settingsGeneral SettingsGeneral?
+}
+
+model SettingsGeneral {
+  id              String       @id @default(cuid())
+  partnerId       String       @unique
+  partner         Partner      @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  displayName     String
+  language        String       @default("en")
+  timezone        String       @default("Africa/Monrovia")
+  defaultCurrency CurrencyCode @default(USD)
+  updatedAt       DateTime     @updatedAt
+}

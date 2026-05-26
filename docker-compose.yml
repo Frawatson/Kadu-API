@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kadu-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kadu
+      POSTGRES_PASSWORD: kadu
+      POSTGRES_DB: kadu
+    # Bound to 5433 host-side so it doesn't fight any local Postgres
+    # already on 5432.
+    ports:
+      - "5433:5432"
+    volumes:
+      - kadu-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kadu -d kadu"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  kadu-pg-data:

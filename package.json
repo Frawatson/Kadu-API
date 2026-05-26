@@ -1,0 +1,32 @@
+{
+  "name": "kadu-api",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Smoke-test backend for the Kadû Partners frontend — Fastify + Prisma + Postgres.",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "build": "tsc -b",
+    "start": "node --env-file=.env dist/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "tsx --env-file=.env prisma/seed.ts",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@fastify/jwt": "^10.0.0",
+    "@prisma/client": "^6.19.2",
+    "bcryptjs": "^3.0.3",
+    "fastify": "^5.8.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.2",
+    "prisma": "^6.19.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}
