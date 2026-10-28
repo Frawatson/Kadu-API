@@ -14,14 +14,16 @@ import type { FastifyRequest } from "fastify";
 import type { Partner } from "@prisma/client";
 import { prisma } from "./prisma.js";
 import {
+  mockCategories,
   mockItems,
   mockLocations,
   mockPayoutMethods,
   partnerCatalog,
+  partnerCategories,
   partnerLocations,
   partnerPayoutMethods,
 } from "../state/fixtures.js";
-import type { CatalogItem } from "../types/catalog.js";
+import type { CatalogCategory, CatalogItem } from "../types/catalog.js";
 import type { ShopLocation } from "../types/partner.js";
 import type { PayoutMethod } from "../types/wallet.js";
 
@@ -165,6 +167,23 @@ export function payoutMethodsForPartner(row: Partner): PayoutMethod[] {
   if (!arr) {
     arr = [];
     partnerPayoutMethods.set(row.id, arr);
+  }
+  return arr;
+}
+
+/**
+ * Shop categories for a partner. Seeded demo partner shares the canonical
+ * `mockCategories`; everyone else gets a private copy of the default
+ * taxonomy on first access (so the Add Product form is usable right away
+ * without a category-setup step). Returned by reference so renames,
+ * reorders and deletes persist for the lifetime of the API process.
+ */
+export function categoriesForPartner(row: Partner): CatalogCategory[] {
+  if (row.email === SEEDED_PARTNER_EMAIL) return mockCategories;
+  let arr = partnerCategories.get(row.id);
+  if (!arr) {
+    arr = mockCategories.map((c) => ({ ...c, itemCount: 0 }));
+    partnerCategories.set(row.id, arr);
   }
   return arr;
 }
