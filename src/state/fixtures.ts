@@ -31,6 +31,13 @@ export const partnerLocations: Map<string, ShopLocation[]> = new Map();
 export const partnerCatalog: Map<string, CatalogItem[]> = new Map();
 
 /**
+ * Per-partner shop categories. The seeded demo partner shares
+ * `mockCategories`; new partners start from a private copy of the default
+ * taxonomy so renames/deletes never leak between partners.
+ */
+export const partnerCategories: Map<string, CatalogCategory[]> = new Map();
+
+/**
  * Per-partner payout methods. Same scoping reason as above — new
  * partners' POSTs need to round-trip through their own GET.
  */
@@ -208,7 +215,7 @@ export const mockItems: CatalogItem[] = [
     stockQuantity: 0,
     stockStatus: "OUT_OF_STOCK",
     photos: ["/mock/cement.jpg"],
-    status: "ACTIVE",
+    status: "DISABLED",
     createdAt: "2026-03-05T08:00:00Z",
     updatedAt: "2026-04-20T14:00:00Z",
   },
